@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이정한 작업 모음</title>
+    <meta name="description" content="GitHub에 올린 작업물을 한 페이지에서 바로 열어 볼 수 있는 모음 페이지. 새로 푸시하면 자동으로 갱신됩니다.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+    <style>
+        :root {
+            --paper: #fff7e4;
+            --paper-2: #fdeec8;
+            --ink: #3a2e2a;
+            --ink-soft: #6a5a52;
+            --ink-mute: #92827a;
+            --green: #a9dc8e;
+            --yellow: #ffd95a;
+            --pink: #ffa9c0;
+            --blue: #9bd6f2;
+            --lilac: #cbb9ff;
+            --white: #fff;
+            --line: 2.5px solid var(--ink);
+            --shadow: 5px 5px 0 var(--ink);
+            --shadow-s: 3px 3px 0 var(--ink);
+            --display: 'Jua', 'Pretendard', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
+            background-color: var(--paper);
+            background-image: radial-gradient(rgba(58, 46, 42, 0.09) 1.2px, transparent 1.2px);
+            background-size: 22px 22px;
+            color: var(--ink); line-height: 1.7; word-break: keep-all; -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        a { color: inherit; }
+        ::selection { background: var(--yellow); }
+        .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        header { padding: 64px 0 28px; text-align: center; }
+        .kicker { display: inline-block; font-weight: 800; font-size: 0.86rem; letter-spacing: 0.06em; background: var(--green); border: var(--line); border-radius: 999px; padding: 4px 16px; box-shadow: var(--shadow-s); transform: rotate(-2deg); margin-bottom: 20px; }
+        h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.4rem, 7vw, 4.2rem); line-height: 1.2; margin-bottom: 14px; }
+        h1 mark { background: linear-gradient(transparent 58%, var(--yellow) 58%, var(--yellow) 92%, transparent 92%); color: inherit; padding: 0 6px; }
+        .lead { color: var(--ink-soft); font-size: 1.08rem; max-width: 560px; margin: 0 auto; }
+
+        .bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 34px 0 10px; }
+        .stats { display: flex; flex-wrap: wrap; gap: 10px; }
+        .chip { font-size: 0.86rem; font-weight: 800; background: var(--white); border: 2px solid var(--ink); border-radius: 999px; padding: 3px 14px; }
+        .chip b { font-family: var(--display); font-weight: 400; font-size: 1.05rem; margin-left: 4px; }
+        .tools { display: flex; gap: 10px; align-items: center; }
+        .search { font: inherit; font-weight: 600; font-size: 0.95rem; padding: 8px 16px; border: var(--line); border-radius: 999px; background: var(--white); color: var(--ink); width: 210px; outline: none; }
+        .search:focus { box-shadow: var(--shadow-s); }
+        .btn-refresh { font: inherit; font-weight: 800; font-size: 0.9rem; cursor: pointer; padding: 8px 16px; border: var(--line); border-radius: 999px; background: var(--yellow); color: var(--ink); box-shadow: var(--shadow-s); transition: transform .12s, box-shadow .12s; }
+        .btn-refresh:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+        .btn-refresh:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+        .live { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 26px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); border: 2px solid var(--ink); animation: pulse 1.8s infinite; }
+        .dot.off { background: var(--pink); animation: none; }
+        @keyframes pulse { 50% { transform: scale(1.35); } }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 30px 26px; padding: 6px 5px 40px 0; }
+        .card { position: relative; display: flex; flex-direction: column; background: var(--white); border: var(--line); border-radius: 20px; box-shadow: var(--shadow); transition: transform .22s cubic-bezier(.2,.9,.3,1.3); animation: pop .5s cubic-bezier(.2,.9,.3,1.2) backwards; }
+        .card:nth-child(odd) { transform: rotate(-0.7deg); }
+        .card:nth-child(even) { transform: rotate(0.6deg); }
+        .card:hover { transform: rotate(0) translateY(-5px); }
+        @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97); } }
+        .top { display: flex; align-items: center; gap: 12px; padding: 18px 18px 16px; border-bottom: var(--line); border-radius: 17px 17px 0 0; }
+        .c0 .top { background: var(--green); } .c1 .top { background: var(--pink); } .c2 .top { background: var(--blue); } .c3 .top { background: var(--yellow); } .c4 .top { background: var(--lilac); }
+        .emoji { flex: none; width: 46px; height: 46px; display: grid; place-items: center; font-size: 1.5rem; background: var(--white); border: var(--line); border-radius: 14px; }
+        .top h2 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; line-height: 1.25; word-break: break-all; }
+        .top small { display: block; font-weight: 700; font-size: 0.78rem; color: var(--ink-soft); }
+        .new { position: absolute; top: -13px; right: 16px; z-index: 2; font-family: var(--display); font-size: 0.82rem; background: var(--pink); border: 2px solid var(--ink); border-radius: 999px; padding: 0 12px; transform: rotate(5deg); box-shadow: 2px 2px 0 var(--ink); }
+        .body { padding: 16px 18px 6px; flex: 1; }
+        .body p { color: var(--ink-soft); font-size: 0.95rem; margin-bottom: 12px; min-height: 3.2em; }
+        .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .meta span { font-size: 0.76rem; font-weight: 800; border: 2px solid var(--ink); border-radius: 6px; padding: 0 8px; background: var(--paper-2); }
+        .extras { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; font-size: 0.86rem; font-weight: 700; }
+        .extras a { text-decoration-color: var(--pink); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+        .actions { display: flex; gap: 10px; padding: 8px 18px 18px; }
+        .actions a, .actions span { flex: 1; text-align: center; font-weight: 800; font-size: 0.92rem; text-decoration: none; padding: 9px 10px; border: var(--line); border-radius: 12px; transition: transform .12s, box-shadow .12s; }
+        .go { background: var(--ink); color: var(--paper); box-shadow: var(--shadow-s); }
+        .go:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--pink); }
+        .gh { background: var(--white); }
+        .gh:hover { background: var(--paper-2); }
+        .nosite { background: var(--paper-2); color: var(--ink-mute); border-style: dashed !important; cursor: help; }
+
+        .empty { text-align: center; padding: 50px 20px; font-weight: 700; color: var(--ink-soft); grid-column: 1 / -1; }
+        .notice { background: var(--yellow); border: var(--line); border-radius: 6px 6px 6px 20px; box-shadow: var(--shadow-s); padding: 12px 18px; font-weight: 600; font-size: 0.92rem; margin: 0 5px 24px 0; display: none; }
+        .notice.show { display: block; }
+
+        footer { margin-top: 20px; border-top: var(--line); background: var(--green); padding: 24px 0 36px; font-size: 0.88rem; font-weight: 700; }
+        footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; }
+        footer span { color: var(--ink-soft); font-weight: 600; }
+
+        @media (max-width: 600px) {
+            header { padding-top: 44px; }
+            .tools, .search { width: 100%; }
+            .tools { flex-wrap: wrap; }
+            .grid { padding-right: 0; grid-template-columns: 1fr; }
+            .card:nth-child(odd), .card:nth-child(even) { transform: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .card, .dot { animation: none; transition: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <span class="kicker">MY WORKS · 작업 모음</span>
+            <h1>이정한의 <mark>작업실</mark></h1>
+            <p class="lead">GitHub에 올린 작업물을 여기서 바로 열어 볼 수 있어요. 새로 푸시하면 이 페이지가 알아서 갱신됩니다.</p>
+        </header>
+
+        <div class="bar">
+            <div class="stats" id="stats"></div>
+            <div class="tools">
+                <input class="search" id="q" type="search" placeholder="작업물 검색" aria-label="작업물 검색">
+                <button class="btn-refresh" id="refresh" type="button">새로고침</button>
+            </div>
+        </div>
+        <div class="live"><span class="dot" id="dot"></span><span id="liveText">불러오는 중…</span></div>
+        <div class="notice" id="notice"></div>
+
+        <main class="grid" id="grid" aria-live="polite"></main>
+    </div>
+
+    <footer>
+        <div class="wrap">
+            <div>이정한 작업 모음 · GitHub <a href="https://github.com/Junghan0329" target="_blank" rel="noopener">Junghan0329</a></div>
+            <span>공개 저장소만 표시됩니다.</span>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            // 새 작업물이 생기면 GitHub 저장소만 푸시하면 자동으로 카드가 늘어납니다.
+            // 아래 목록은 제목·설명·추가 링크를 직접 꾸미고 싶은 저장소에만 적습니다. (키는 저장소 이름 소문자)
+            var OWNER = 'Junghan0329';
+            var SHOW_FORKS = false; // true로 바꾸면 다른 사람 저장소를 포크한 것도 함께 보여 줍니다.
+            var CUSTOM = {
+                'junghanlee': {
+                    emoji: '🧑‍💻', title: '이정한 포트폴리오',
+                    desc: 'Unity 개발자 이정한의 학력과 프로젝트 경험을 정리한 포트폴리오입니다.',
+                    url: 'https://jung-han-lee.vercel.app/',
+                    extras: [{ label: '이벤트 기획서', url: 'https://jung-han-lee.vercel.app/%EC%9D%B4%EB%B2%A4%ED%8A%B8%20%EA%B8%B0%ED%9A%8D.html' }]
+                },
+                'trickcal-report': {
+                    emoji: '📖', title: '트릭컬 리바이브 분석 리포트',
+                    desc: '스토리·캐릭터 공급 루프가 유저를 붙잡는 방식을 분석한 게임 재미요소 리포트입니다.',
+                    url: 'https://trickcal-report.vercel.app/'
+                },
+                '3dgame': { emoji: '🎮', title: '3D 게임', desc: 'C#으로 만든 3D 게임 프로젝트입니다.' }
+            };
+            var EMOJI = ['✨', '🧩', '🛠️', '🌱', '🎲', '📦'];
+
+            var grid = document.getElementById('grid');
+            var stats = document.getElementById('stats');
+            var dot = document.getElementById('dot');
+            var liveText = document.getElementById('liveText');
+            var notice = document.getElementById('notice');
+            var q = document.getElementById('q');
+            var repos = [];
+            var etag = null;
+            var lastOk = null;
+
+            function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+            function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+            function ago(iso) {
+                var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+                if (s < 90) return '방금 전';
+                if (s < 3600) return Math.round(s / 60) + '분 전';
+                if (s < 86400) return Math.round(s / 3600) + '시간 전';
+                if (s < 86400 * 30) return Math.round(s / 86400) + '일 전';
+                return new Date(iso).toLocaleDateString('ko-KR');
+            }
+
+            function normalize(r) {
+                var key = r.name.toLowerCase();
+                var c = CUSTOM[key] || {};
+                var site = safeUrl(c.url) || safeUrl(r.homepage);
+                return {
+                    name: r.name, key: key,
+                    title: c.title || r.name,
+                    desc: c.desc || r.description || '설명이 아직 없는 저장소예요.',
+                    emoji: c.emoji || EMOJI[r.name.length % EMOJI.length],
+                    site: site, extras: c.extras || [],
+                    gh: r.html_url, lang: r.language, pushed: r.pushed_at
+                };
+            }
+
+            function fallbackFromCustom() {
+                return Object.keys(CUSTOM).map(function (k) {
+                    var c = CUSTOM[k];
+                    return normalize({ name: k, html_url: 'https://github.com/' + OWNER + '/' + k, language: null, pushed_at: null, description: c.desc, homepage: c.url });
+                });
+            }
+
+            function render() {
+                var term = q.value.trim().toLowerCase();
+                var items = repos.slice().sort(function (a, b) { return new Date(b.pushed || 0) - new Date(a.pushed || 0); });
+                var shown = items.filter(function (r) { return !term || (r.title + ' ' + r.name + ' ' + r.desc).toLowerCase().indexOf(term) !== -1; });
+
+                var deployed = items.filter(function (r) { return r.site; }).length;
+                stats.innerHTML = '<span class="chip">작업물<b>' + items.length + '</b></span><span class="chip">배포 중<b>' + deployed + '</b></span>';
+
+                if (!shown.length) { grid.innerHTML = '<div class="empty">' + (term ? '검색 결과가 없어요.' : '표시할 작업물이 없어요.') + '</div>'; return; }
+
+                grid.innerHTML = shown.map(function (r, i) {
+                    var isNew = r.pushed && (Date.now() - new Date(r.pushed).getTime()) < 86400000;
+                    var site = r.site
+                        ? '<a class="go" href="' + esc(r.site) + '" target="_blank" rel="noopener">사이트 열기 ↗</a>'
+                        : '<span class="nosite" title="GitHub 저장소 About의 Website에 배포 주소를 넣으면 이 버튼이 자동으로 생겨요">배포 주소 없음</span>';
+                    var extras = r.extras.length ? '<div class="extras">' + r.extras.map(function (e) { return '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">→ ' + esc(e.label) + '</a>'; }).join('') + '</div>' : '';
+                    return '<article class="card c' + (i % 5) + '" style="animation-delay:' + Math.min(i, 8) * 60 + 'ms">' +
+                        (isNew ? '<span class="new">NEW</span>' : '') +
+                        '<div class="top"><div class="emoji">' + r.emoji + '</div><div><h2>' + esc(r.title) + '</h2><small>' + esc(r.name) + '</small></div></div>' +
+                        '<div class="body"><p>' + esc(r.desc) + '</p>' +
+                        '<div class="meta">' + (r.lang ? '<span>' + esc(r.lang) + '</span>' : '') + (r.pushed ? '<span>업데이트 ' + ago(r.pushed) + '</span>' : '') + '</div>' + extras + '</div>' +
+                        '<div class="actions">' + site + '<a class="gh" href="' + esc(r.gh) + '" target="_blank" rel="noopener">GitHub</a></div></article>';
+                }).join('');
+            }
+
+            function setLive(ok, text) {
+                dot.className = 'dot' + (ok ? '' : ' off');
+                liveText.textContent = text;
+            }
+
+            function load(manual) {
+                var headers = { 'Accept': 'application/vnd.github+json' };
+                if (etag && !manual) headers['If-None-Match'] = etag;
+                return fetch('https://api.github.com/users/' + OWNER + '/repos?per_page=100&sort=pushed', { headers: headers })
+                    .then(function (res) {
+                        if (res.status === 304) { lastOk = new Date(); return null; }
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        etag = res.headers.get('ETag');
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        if (data) { repos = data.filter(function (r) { return (SHOW_FORKS || !r.fork) && !r.archived; }).map(normalize); lastOk = new Date(); notice.className = 'notice'; render(); }
+                        setLive(true, '실시간 연결됨 · 마지막 확인 ' + lastOk.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+                    })
+                    .catch(function () {
+                        if (!repos.length) { repos = fallbackFromCustom(); render(); }
+                        notice.textContent = 'GitHub에서 최신 목록을 가져오지 못했어요. 잠시 후 자동으로 다시 시도하고, 그동안은 저장해 둔 목록을 보여 드려요.';
+                        notice.className = 'notice show';
+                        setLive(false, '연결 대기 중 · 자동 재시도');
+                    });
+            }
+
+            q.addEventListener('input', render);
+            document.getElementById('refresh').addEventListener('click', function () { setLive(true, '새로 불러오는 중…'); load(true); });
+            setInterval(function () { if (!document.hidden) { load(false); render(); } }, 60000);
+            document.addEventListener('visibilitychange', function () { if (!document.hidden) load(false); });
+            load(true);
+        })();
+    </script>
+</body>
+</html>
