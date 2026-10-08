@@ -143,6 +143,7 @@
             // 아래 목록은 제목·설명·추가 링크를 직접 꾸미고 싶은 저장소에만 적습니다. (키는 저장소 이름 소문자)
             var OWNER = 'Junghan0329';
             var SHOW_FORKS = false; // true로 바꾸면 다른 사람 저장소를 포크한 것도 함께 보여 줍니다.
+            var HIDE = ['my-works']; // 목록에서 숨길 저장소(모음 페이지 자신). 이름은 소문자로 적습니다.
             var CUSTOM = {
                 'junghanlee': {
                     emoji: '🧑‍💻', title: '이정한 포트폴리오',
@@ -242,7 +243,7 @@
                         return res.json();
                     })
                     .then(function (data) {
-                        if (data) { repos = data.filter(function (r) { return (SHOW_FORKS || !r.fork) && !r.archived; }).map(normalize); lastOk = new Date(); notice.className = 'notice'; render(); }
+                        if (data) { repos = data.filter(function (r) { return (SHOW_FORKS || !r.fork) && !r.archived && HIDE.indexOf(r.name.toLowerCase()) === -1; }).map(normalize); lastOk = new Date(); notice.className = 'notice'; render(); }
                         setLive(true, '실시간 연결됨 · 마지막 확인 ' + lastOk.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
                     })
                     .catch(function () {
