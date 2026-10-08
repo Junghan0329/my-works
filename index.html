@@ -13,17 +13,18 @@
 
     <style>
         :root {
-            --paper: #fff7e4;
-            --paper-2: #fdeec8;
-            --ink: #3a2e2a;
-            --ink-soft: #6a5a52;
-            --ink-mute: #92827a;
-            --green: #a9dc8e;
-            --yellow: #ffd95a;
-            --pink: #ffa9c0;
-            --blue: #9bd6f2;
-            --lilac: #cbb9ff;
-            --white: #fff;
+            /* 색은 4가지만 씁니다: 종이, 잉크, 세이지 그린, 더스티 로즈. 나머지는 이 넷을 섞은 옅은 톤이에요 */
+            --paper: #f3ecdc;
+            --ink: #3b322e;
+            --green: #b9d3a6;
+            --pink: #e7b7bb;
+            --paper-2: color-mix(in srgb, var(--ink) 8%, var(--paper));
+            --ink-soft: color-mix(in srgb, var(--ink) 82%, var(--paper));
+            --ink-mute: color-mix(in srgb, var(--ink) 68%, var(--paper));
+            --yellow: var(--pink);
+            --blue: var(--green);
+            --lilac: var(--green);
+            --white: var(--paper);
             --line: 2.5px solid var(--ink);
             --shadow: 5px 5px 0 var(--ink);
             --shadow-s: 3px 3px 0 var(--ink);
@@ -33,7 +34,7 @@
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
             background-color: var(--paper);
-            background-image: radial-gradient(rgba(58, 46, 42, 0.09) 1.2px, transparent 1.2px);
+            background-image: radial-gradient(rgba(59, 50, 46, 0.06) 1.2px, transparent 1.2px);
             background-size: 22px 22px;
             color: var(--ink); line-height: 1.7; word-break: keep-all; -webkit-font-smoothing: antialiased;
             min-height: 100vh;
@@ -70,7 +71,7 @@
         .card:hover { transform: rotate(0) translateY(-5px); }
         @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97); } }
         .top { display: flex; align-items: center; gap: 12px; padding: 18px 18px 16px; border-bottom: var(--line); border-radius: 17px 17px 0 0; }
-        .c0 .top { background: var(--green); } .c1 .top { background: var(--pink); } .c2 .top { background: var(--blue); } .c3 .top { background: var(--yellow); } .c4 .top { background: var(--lilac); }
+        .c0 .top, .c2 .top, .c4 .top { background: var(--green); } .c1 .top, .c3 .top { background: var(--pink); }
         .emoji { flex: none; width: 46px; height: 46px; display: grid; place-items: center; font-size: 1.5rem; background: var(--white); border: var(--line); border-radius: 14px; }
         .top h2 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; line-height: 1.25; word-break: break-all; }
         .top small { display: block; font-weight: 700; font-size: 0.78rem; color: var(--ink-soft); }
@@ -155,6 +156,11 @@
                     emoji: '📖', title: '트릭컬 리바이브 분석 리포트',
                     desc: '스토리·캐릭터 공급 루프가 유저를 붙잡는 방식을 분석한 게임 재미요소 리포트입니다.',
                     url: 'https://trickcal-report.vercel.app/'
+                },
+                'my-games': {
+                    emoji: '🎮', title: '게임 모음',
+                    desc: 'Unity로 만든 게임을 브라우저에서 바로 플레이할 수 있는 모음 페이지입니다.',
+                    url: 'https://my-games-gules.vercel.app/'
                 },
                 '3dgame': { emoji: '🎮', title: '3D 게임', desc: 'C#으로 만든 3D 게임 프로젝트입니다.' }
             };
