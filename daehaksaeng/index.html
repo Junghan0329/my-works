@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#f3eee6">
+    <title>대학생키우기(캡스톤 디자인)</title>
+    <meta name="description" content="유한대학교 게임콘텐츠 캡스톤디자인 「대학생 키우기」 v2 프로토타입 (팀 사이좋게 지내자)">
+    <style>
+      html, body { margin: 0; height: 100%; background: #f3eee6; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
+      body { font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #2b2622; }
+      #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+      #unity-canvas { display: block; background: #f3eee6; outline: none; -webkit-tap-highlight-color: transparent; }
+      #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; }
+      #loading h1 { margin: 0; font-size: 22px; }
+      #loading p { margin: 0; font-size: 14px; color: #6b625a; }
+      #bar { width: min(260px, 70vw); height: 8px; border-radius: 99px; background: #e2d9cc; overflow: hidden; }
+      #bar > div { width: 0; height: 100%; background: #4f7be0; transition: width .2s; }
+      #error { display: none; color: #b3402f; font-size: 14px; max-width: 320px; }
+    </style>
+  </head>
+  <body>
+    <div id="stage"><canvas id="unity-canvas" tabindex="-1"></canvas></div>
+    <div id="loading">
+      <h1>대학생 키우기</h1>
+      <p>캡스톤디자인 v2 프로토타입 · 불러오는 중</p>
+      <div id="bar"><div></div></div>
+      <p id="error"></p>
+    </div>
+    <script>
+      // 게임 화면은 세로 1080x2400(9:20). 화면에 맞춰 비율을 지키며 최대한 크게 띄운다.
+      var ASPECT = 1080 / 2400;
+      var canvas = document.querySelector("#unity-canvas");
+      function fit() {
+        var w = window.innerWidth, h = window.innerHeight;
+        var cw = Math.min(w, h * ASPECT), ch = cw / ASPECT;
+        if (ch > h) { ch = h; cw = h * ASPECT; }
+        canvas.style.width = Math.floor(cw) + "px";
+        canvas.style.height = Math.floor(ch) + "px";
+      }
+      fit();
+      window.addEventListener("resize", fit);
+
+      var buildUrl = "Build";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/WebGL_deploy.data.unityweb",
+        frameworkUrl: buildUrl + "/WebGL_deploy.framework.js.unityweb",
+        codeUrl: buildUrl + "/WebGL_deploy.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "University Life Simulator",
+        productVersion: "1.0",
+        // 폰에서 너무 큰 해상도로 그리면 느려서 2배까지만
+        devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+        showBanner: function (msg, type) { if (type === "error") showError(msg); },
+      };
+
+      function showError(msg) {
+        var e = document.querySelector("#error");
+        e.textContent = "불러오지 못했어요: " + msg;
+        e.style.display = "block";
+      }
+
+      var script = document.createElement("script");
+      script.src = buildUrl + "/WebGL_deploy.loader.js";
+      script.onload = function () {
+        createUnityInstance(canvas, config, function (progress) {
+          document.querySelector("#bar > div").style.width = (100 * progress) + "%";
+        }).then(function () {
+          document.querySelector("#loading").style.display = "none";
+          canvas.focus();
+        }).catch(function (message) { showError(message); });
+      };
+      script.onerror = function () { showError("게임 파일을 받지 못했어요. 새로고침해 주세요."); };
+      document.body.appendChild(script);
+
+      // 첫 터치 전에 캔버스에 포커스를 줘서 첫 터치가 버튼에 바로 들어가게 한다
+      canvas.addEventListener("pointerdown", function () { canvas.focus(); }, { capture: true });
+    </script>
+  </body>
+</html>
