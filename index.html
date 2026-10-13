@@ -144,14 +144,19 @@
             // 아래 목록은 제목·설명·추가 링크를 직접 꾸미고 싶은 저장소에만 적습니다. (키는 저장소 이름 소문자)
             var OWNER = 'Junghan0329';
             var SHOW_FORKS = false; // true로 바꾸면 다른 사람 저장소를 포크한 것도 함께 보여 줍니다.
-            var HIDE = ['my-works']; // 목록에서 숨길 저장소(모음 페이지 자신). 이름은 소문자로 적습니다.
+            var HIDE = ['my-works', 'daehaksaeng']; // 목록에서 숨길 저장소(모음 페이지 자신). 이름은 소문자로 적습니다.
             // 공개 저장소가 없는 작업물(비공개 저장소, 외부 페이지)도 카드로 보여 줍니다.
             // private: true 면 '비공개' 표시가 붙고, 버튼은 '열기 (본인만)'이 됩니다.
+            // buttons 를 주면 그 버튼들을 순서대로 보여 줍니다 (첫 버튼이 강조). note 는 작은 표시 한 줄.
             var LINKS = [
                 {
-                    name: 'daehaksaeng-devlog', emoji: '📓', title: '대학생 키우기 개발일지',
-                    desc: '캡스톤디자인 「대학생 키우기」를 만들며 매일 쓰는 개발일지예요. 1일차부터 일차별로 골라 볼 수 있어요.',
-                    url: 'https://claude.ai/artifact/RYAw8F1DZqwiUH4zjMYqHR', private: true
+                    name: 'daehaksaeng', emoji: '🎓', title: '대학생키우기(캡스톤 디자인)',
+                    desc: '캡스톤디자인 「대학생 키우기」 v2 프로토타입을 폰 브라우저에서 바로 플레이하고, 매일 쓰는 개발일지를 일차별로 볼 수 있어요.',
+                    buttons: [
+                        { label: '프로토타입 플레이 ↗', url: '/daehaksaeng/' },
+                        { label: '개발일지 (본인만) ↗', url: 'https://claude.ai/artifact/RYAw8F1DZqwiUH4zjMYqHR' }
+                    ],
+                    note: '🔒 개발일지는 본인만 열람'
                 }
             ];
             var CUSTOM = {
@@ -190,7 +195,7 @@
             var lastOk = null;
 
             function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-            function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? u : ''; }
+            function safeUrl(u) { return /^(https?:\/\/|\/(?!\/))/i.test(u || '') ? u : ''; }
             function ago(iso) {
                 var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
                 if (s < 90) return '방금 전';
@@ -219,8 +224,10 @@
                     return {
                         name: l.name, key: l.name.toLowerCase(), title: l.title, desc: l.desc,
                         emoji: l.emoji || EMOJI[l.name.length % EMOJI.length],
-                        site: safeUrl(l.url), extras: l.extras || [],
-                        gh: '', lang: null, pushed: l.pushed || null, priv: !!l.private
+                        site: safeUrl(l.url || (l.buttons && l.buttons[0] && l.buttons[0].url) || ''), extras: l.extras || [],
+                        gh: '', lang: null, pushed: l.pushed || null, priv: !!l.private,
+                        buttons: (l.buttons || []).filter(function (b) { return /^(https?:\/\/|\/(?!\/))/i.test(b.url || ''); }),
+                        note: l.note || ''
                     };
                 });
             }
@@ -247,12 +254,13 @@
                     var site = r.site
                         ? '<a class="go" href="' + esc(r.site) + '" target="_blank" rel="noopener">' + (r.priv ? '열기 (본인만) ↗' : '사이트 열기 ↗') + '</a>'
                         : '<span class="nosite" title="GitHub 저장소 About의 Website에 배포 주소를 넣으면 이 버튼이 자동으로 생겨요">배포 주소 없음</span>';
+                    if (r.buttons && r.buttons.length) site = r.buttons.map(function (b, k) { return '<a class="' + (k ? 'gh' : 'go') + '" href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.label) + '</a>'; }).join('');
                     var extras = r.extras.length ? '<div class="extras">' + r.extras.map(function (e) { return '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">→ ' + esc(e.label) + '</a>'; }).join('') + '</div>' : '';
                     return '<article class="card c' + (i % 5) + '" style="animation-delay:' + Math.min(i, 8) * 60 + 'ms">' +
                         (isNew ? '<span class="new">NEW</span>' : '') +
                         '<div class="top"><div class="emoji">' + r.emoji + '</div><div><h2>' + esc(r.title) + '</h2><small>' + esc(r.name) + '</small></div></div>' +
                         '<div class="body"><p>' + esc(r.desc) + '</p>' +
-                        '<div class="meta">' + (r.priv ? '<span>🔒 비공개 · 본인만 열람</span>' : '') + (r.lang ? '<span>' + esc(r.lang) + '</span>' : '') + (r.pushed ? '<span>업데이트 ' + ago(r.pushed) + '</span>' : '') + '</div>' + extras + '</div>' +
+                        '<div class="meta">' + (r.priv ? '<span>🔒 비공개 · 본인만 열람</span>' : '') + (r.note ? '<span>' + esc(r.note) + '</span>' : '') + (r.lang ? '<span>' + esc(r.lang) + '</span>' : '') + (r.pushed ? '<span>업데이트 ' + ago(r.pushed) + '</span>' : '') + '</div>' + extras + '</div>' +
                         '<div class="actions">' + site + (r.gh ? '<a class="gh" href="' + esc(r.gh) + '" target="_blank" rel="noopener">GitHub</a>' : '') + '</div></article>';
                 }).join('');
             }
