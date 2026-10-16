@@ -88,6 +88,8 @@
         .go:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--pink); }
         .gh { background: var(--white); }
         .gh:hover { background: var(--paper-2); }
+        .actions a.local-off { background: var(--paper-2); color: var(--ink-mute); border-style: dashed; box-shadow: none; }
+        .actions a.local-off:hover { transform: none; box-shadow: none; }
         .nosite { background: var(--paper-2); color: var(--ink-mute); border-style: dashed !important; cursor: help; }
 
         .empty { text-align: center; padding: 50px 20px; font-weight: 700; color: var(--ink-soft); grid-column: 1 / -1; }
@@ -261,7 +263,7 @@
                     var site = r.site
                         ? '<a class="go" href="' + esc(r.site) + '" target="_blank" rel="noopener">' + (r.priv ? '열기 (본인만) ↗' : '사이트 열기 ↗') + '</a>'
                         : '<span class="nosite" title="GitHub 저장소 About의 Website에 배포 주소를 넣으면 이 버튼이 자동으로 생겨요">배포 주소 없음</span>';
-                    if (r.buttons && r.buttons.length) site = r.buttons.map(function (b, k) { return '<a class="' + (k ? 'gh' : 'go') + '" href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.label) + '</a>'; }).join('');
+                    if (r.buttons && r.buttons.length) site = r.buttons.map(function (b, k) { return '<a class="' + (k ? 'gh' : 'go') + '"' + (isLocal(b.url) ? ' data-local="' + esc(b.url) + '" data-label="' + esc(b.label) + '"' : '') + ' href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.label) + '</a>'; }).join('');
                     var extras = r.extras.length ? '<div class="extras">' + r.extras.map(function (e) { return '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">→ ' + esc(e.label) + '</a>'; }).join('') + '</div>' : '';
                     return '<article class="card c' + (i % 5) + '" style="animation-delay:' + Math.min(i, 8) * 60 + 'ms">' +
                         (isNew ? '<span class="new">NEW</span>' : '') +
@@ -270,7 +272,31 @@
                         '<div class="meta">' + (r.priv ? '<span>🔒 비공개 · 본인만 열람</span>' : '') + (r.note ? '<span>' + esc(r.note) + '</span>' : '') + (r.lang ? '<span>' + esc(r.lang) + '</span>' : '') + (r.pushed ? '<span>업데이트 ' + ago(r.pushed) + '</span>' : '') + '</div>' + extras + '</div>' +
                         '<div class="actions">' + site + (r.gh ? '<a class="gh" href="' + esc(r.gh) + '" target="_blank" rel="noopener">GitHub</a>' : '') + '</div></article>';
                 }).join('');
+                probeLocal();
             }
+
+            // 내 PC(localhost)에서만 열리는 버튼: PC에서 서버가 꺼져 있으면 '연결할 수 없음' 화면 대신 안내를 보여 줍니다.
+            function isLocal(u) { return /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/|$)/i.test(u || ''); }
+            var LOCAL_HINT = '지금은 열 수 없어요. 내 PC에서 「루미나 테일즈 플레이」를 켠 뒤 다시 눌러 주세요.';
+            function probeLocal() {
+                Array.prototype.forEach.call(grid.querySelectorAll('a[data-local]'), function (a) {
+                    var url = a.getAttribute('data-local'), label = a.getAttribute('data-label');
+                    var ctrl = new AbortController();
+                    var timer = setTimeout(function () { ctrl.abort(); }, 2500);
+                    fetch(url, { mode: 'no-cors', cache: 'no-store', signal: ctrl.signal })
+                        .then(function () { a.classList.remove('local-off'); a.textContent = label; a.removeAttribute('title'); })
+                        .catch(function () { a.classList.add('local-off'); a.textContent = '웹 플레이 준비 중 · PC 꺼짐'; a.title = LOCAL_HINT; })
+                        .then(function () { clearTimeout(timer); });
+                });
+            }
+            grid.addEventListener('click', function (e) {
+                var a = e.target.closest && e.target.closest('a.local-off');
+                if (!a) return;
+                e.preventDefault();
+                notice.textContent = LOCAL_HINT;
+                notice.className = 'notice show';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
 
             function setLive(ok, text) {
                 dot.className = 'dot' + (ok ? '' : ' off');
