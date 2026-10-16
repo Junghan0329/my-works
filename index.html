@@ -278,14 +278,28 @@
             }
 
             function load(manual) {
-                var headers = { 'Accept': 'application/vnd.github+json' };
-                if (etag && !manual) headers['If-None-Match'] = etag;
-                return fetch('https://api.github.com/users/' + OWNER + '/repos?per_page=100&sort=pushed', { headers: headers })
+                // 1순위: 서버(/api/repos)가 GitHub를 대신 불러와 캐시해 둔 목록 (방문자마다 GitHub 한도를 쓰지 않음)
+                // 2순위: GitHub 직접 호출 (처음 열 때·새로고침 버튼을 눌렀을 때만, 자동 반복에서는 쓰지 않음)
+                function direct() {
+                    var headers = { 'Accept': 'application/vnd.github+json' };
+                    if (etag && !manual) headers['If-None-Match'] = etag;
+                    return fetch('https://api.github.com/users/' + OWNER + '/repos?per_page=100&sort=pushed', { headers: headers })
+                        .then(function (res) {
+                            if (res.status === 304) { lastOk = new Date(); return null; }
+                            if (!res.ok) throw new Error('HTTP ' + res.status);
+                            etag = res.headers.get('ETag');
+                            return res.json();
+                        });
+                }
+                return fetch('/api/repos', { cache: 'no-store' })
                     .then(function (res) {
-                        if (res.status === 304) { lastOk = new Date(); return null; }
                         if (!res.ok) throw new Error('HTTP ' + res.status);
-                        etag = res.headers.get('ETag');
                         return res.json();
+                    })
+                    .then(function (data) { if (!Array.isArray(data)) throw new Error('bad data'); return data; })
+                    .catch(function () {
+                        if (manual || !repos.length) return direct();
+                        throw new Error('skip direct');
                     })
                     .then(function (data) {
                         if (data) { repos = data.filter(function (r) { return (SHOW_FORKS || !r.fork) && !r.archived && HIDE.indexOf(r.name.toLowerCase()) === -1; }).map(normalize).concat(linkCards()); lastOk = new Date(); notice.className = 'notice'; render(); }

@@ -1,0 +1,37 @@
+name: 대학생키우기 웹 빌드 동기화
+
+# daehaksaeng 저장소에 새 WebGL 빌드를 푸시하면, 이 저장소의 /daehaksaeng 폴더가 자동으로 같은 내용으로 바뀌고
+# Vercel이 새로 배포합니다. (30분마다 확인 + Actions 탭에서 수동 실행 가능)
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: daehaksaeng 저장소 가져오기
+        run: git clone --depth 1 https://github.com/Junghan0329/daehaksaeng.git "$RUNNER_TEMP/dh"
+
+      - name: 빌드 폴더 교체
+        run: |
+          # 빌드가 올라오지 않은 상태(README만 있음)에서는 기존 폴더를 건드리지 않는다.
+          if [ ! -f "$RUNNER_TEMP/dh/index.html" ]; then echo "index.html 없음 - 동기화 건너뜀"; exit 0; fi
+          rm -rf daehaksaeng
+          mkdir daehaksaeng
+          rsync -a --exclude='.git' --exclude='README.md' "$RUNNER_TEMP/dh/" daehaksaeng/
+
+      - name: 바뀐 게 있으면 커밋
+        run: |
+          git add -A daehaksaeng
+          if git diff --cached --quiet; then echo "변경 없음"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "대학생키우기 웹 빌드 자동 동기화"
+          git push
