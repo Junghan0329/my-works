@@ -1,21 +1,21 @@
 {
   "headers": [
     {
-      "source": "/lumina-tales/Build/(.*)\.wasm\.unityweb",
+      "source": "/lumina-tales/Build/WebGL_2026-10-16.wasm.unityweb",
       "headers": [
         { "key": "Content-Encoding", "value": "gzip" },
         { "key": "Content-Type", "value": "application/wasm" }
       ]
     },
     {
-      "source": "/lumina-tales/Build/(.*)\.framework\.js\.unityweb",
+      "source": "/lumina-tales/Build/WebGL_2026-10-16.framework.js.unityweb",
       "headers": [
         { "key": "Content-Encoding", "value": "gzip" },
         { "key": "Content-Type", "value": "application/javascript" }
       ]
     },
     {
-      "source": "/lumina-tales/Build/(.*)\.data\.unityweb",
+      "source": "/lumina-tales/Build/WebGL_2026-10-16.data.unityweb",
       "headers": [
         { "key": "Content-Encoding", "value": "gzip" },
         { "key": "Content-Type", "value": "application/octet-stream" }
