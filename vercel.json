@@ -1,0 +1,25 @@
+{
+  "headers": [
+    {
+      "source": "/lumina-tales/Build/(.*)\.wasm\.unityweb",
+      "headers": [
+        { "key": "Content-Encoding", "value": "gzip" },
+        { "key": "Content-Type", "value": "application/wasm" }
+      ]
+    },
+    {
+      "source": "/lumina-tales/Build/(.*)\.framework\.js\.unityweb",
+      "headers": [
+        { "key": "Content-Encoding", "value": "gzip" },
+        { "key": "Content-Type", "value": "application/javascript" }
+      ]
+    },
+    {
+      "source": "/lumina-tales/Build/(.*)\.data\.unityweb",
+      "headers": [
+        { "key": "Content-Encoding", "value": "gzip" },
+        { "key": "Content-Type", "value": "application/octet-stream" }
+      ]
+    }
+  ]
+}
