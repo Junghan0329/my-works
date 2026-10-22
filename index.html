@@ -167,6 +167,12 @@
                         { label: '웹 플레이 ↗', url: '/lumina-tales/' }
                     ],
                     note: '💻 PC 브라우저 권장 · 처음엔 불러오는 데 시간이 걸려요'
+                },
+                {
+                    name: 'spot-the-difference', emoji: '🔍', title: '기억의 모순 (틀린그림찾기)',
+                    desc: '두 장의 사건 현장 그림에서 차이점을 찾아 증거를 모으고, 증거를 연결해 사건의 진실을 추리하는 Unity 2D 미스터리 틀린그림찾기 게임입니다.',
+                    private: true, pushed: '2026-10-22T09:31:31Z',
+                    note: '🛠️ 개발 중 · 웹 빌드 준비 중'
                 }
             ];
             var CUSTOM = {
@@ -262,7 +268,7 @@
                     var isNew = r.pushed && (Date.now() - new Date(r.pushed).getTime()) < 86400000;
                     var site = r.site
                         ? '<a class="go" href="' + esc(r.site) + '" target="_blank" rel="noopener">' + (r.priv ? '열기 (본인만) ↗' : '사이트 열기 ↗') + '</a>'
-                        : '<span class="nosite" title="GitHub 저장소 About의 Website에 배포 주소를 넣으면 이 버튼이 자동으로 생겨요">배포 주소 없음</span>';
+                        : '<span class="nosite" title="' + (r.priv ? '웹 빌드를 올리면 이 자리에 플레이 버튼이 생겨요' : 'GitHub 저장소 About의 Website에 배포 주소를 넣으면 이 버튼이 자동으로 생겨요') + '">' + (r.priv ? '웹 빌드 준비 중' : '배포 주소 없음') + '</span>';
                     if (r.buttons && r.buttons.length) site = r.buttons.map(function (b, k) { return '<a class="' + (k ? 'gh' : 'go') + '"' + (isLocal(b.url) ? ' data-local="' + esc(b.url) + '" data-label="' + esc(b.label) + '"' : '') + ' href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.label) + '</a>'; }).join('');
                     var extras = r.extras.length ? '<div class="extras">' + r.extras.map(function (e) { return '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">→ ' + esc(e.label) + '</a>'; }).join('') + '</div>' : '';
                     return '<article class="card c' + (i % 5) + '" style="animation-delay:' + Math.min(i, 8) * 60 + 'ms">' +
