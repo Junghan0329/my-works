@@ -150,25 +150,8 @@
             // 공개 저장소가 없는 작업물(비공개 저장소, 외부 페이지)도 카드로 보여 줍니다.
             // private: true 면 '비공개' 표시가 붙고, 버튼은 '열기 (본인만)'이 됩니다.
             // buttons 를 주면 그 버튼들을 순서대로 보여 줍니다 (첫 버튼이 강조). note 는 작은 표시 한 줄.
-            var LINKS = [
-                {
-                    name: 'daehaksaeng', emoji: '🎓', title: '대학생키우기(캡스톤 디자인)',
-                    desc: '캡스톤디자인 「대학생 키우기」 v2 프로토타입을 폰 브라우저에서 바로 플레이하고, 매일 쓰는 개발일지를 일차별로 볼 수 있어요.',
-                    buttons: [
-                        { label: '프로토타입 플레이 ↗', url: '/daehaksaeng/' },
-                        { label: '개발일지 (본인만) ↗', url: 'https://claude.ai/artifact/RYAw8F1DZqwiUH4zjMYqHR' }
-                    ],
-                    note: '🔒 개발일지는 본인만 열람'
-                },
-                {
-                    name: 'lumina-tales', emoji: '🌟', title: 'Lumina Tales (루미나 테일즈)',
-                    desc: '꾸미고, 강해지고, 함께 어둠의 보스를 쓰러뜨리는 SD 판타지 MMORPG',
-                    buttons: [
-                        { label: '웹 플레이 ↗', url: '/lumina-tales/' }
-                    ],
-                    note: '💻 PC 브라우저 권장 · 처음엔 불러오는 데 시간이 걸려요'
-                }
-            ];
+            // 대학생키우기·루미나 테일즈는 게임 모음(my-games) 카드로 옮겼다. 게임 파일은 이 사이트의 /daehaksaeng/, /lumina-tales/ 에 그대로 둔다.
+            var LINKS = [];
             var CUSTOM = {
                 'junghanlee': {
                     emoji: '🧑‍💻', title: '이정한 포트폴리오',
