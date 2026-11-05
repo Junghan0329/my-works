@@ -82,6 +82,15 @@
         .meta span { font-size: 0.76rem; font-weight: 800; border: 2px solid var(--ink); border-radius: 6px; padding: 0 8px; background: var(--paper-2); }
         .extras { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; font-size: 0.86rem; font-weight: 700; }
         .extras a { text-decoration-color: var(--pink); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+        .list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+        .list .row { display: flex; align-items: center; gap: 10px; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 12px; padding: 9px 12px; }
+        .list .main { flex: 1; min-width: 0; text-decoration: none; font-size: 0.95rem; line-height: 1.35; }
+        .list .main b { font-weight: 800; }
+        .list .main:hover b { text-decoration: underline; text-decoration-color: var(--pink); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+        .list .main small { display: block; margin-top: 2px; font-weight: 600; font-size: 0.78rem; color: var(--ink-soft); }
+        .list .git { flex: none; font-size: 0.76rem; font-weight: 800; text-decoration: none; background: var(--white); border: 2px solid var(--ink); border-radius: 999px; padding: 0 10px; }
+        .list .git:hover { background: var(--green); }
+        .card.listcard .body { padding-bottom: 18px; }
         .actions { display: flex; gap: 10px; padding: 8px 18px 18px; }
         .actions a, .actions span { flex: 1; text-align: center; font-weight: 800; font-size: 0.92rem; text-decoration: none; padding: 9px 10px; border: var(--line); border-radius: 12px; transition: transform .12s, box-shadow .12s; }
         .go { background: var(--ink); color: var(--paper); box-shadow: var(--shadow-s); }
@@ -146,23 +155,32 @@
             // 아래 목록은 제목·설명·추가 링크를 직접 꾸미고 싶은 저장소에만 적습니다. (키는 저장소 이름 소문자)
             var OWNER = 'Junghan0329';
             var SHOW_FORKS = false; // true로 바꾸면 다른 사람 저장소를 포크한 것도 함께 보여 줍니다.
-            var HIDE = ['my-works', 'daehaksaeng', '3dgame', 'memory-contradiction-web']; // 목록에서 숨길 저장소(모음 페이지 자신, 게임 모음에 따로 올린 웹 빌드). 이름은 소문자로 적습니다.
+            var HIDE = ['my-works', 'daehaksaeng', '3dgame', 'memory-contradiction-web', 'trickcal-report', 'nikke-report']; // 목록에서 숨길 저장소(모음 페이지 자신, 게임 모음에 따로 올린 웹 빌드, 게임분석 카드 안에 묶은 리포트 저장소). 이름은 소문자로 적습니다.
             // 공개 저장소가 없는 작업물(비공개 저장소, 외부 페이지)도 카드로 보여 줍니다.
             // private: true 면 '비공개' 표시가 붙고, 버튼은 '열기 (본인만)'이 됩니다.
             // buttons 를 주면 그 버튼들을 순서대로 보여 줍니다 (첫 버튼이 강조). note 는 작은 표시 한 줄.
             // 대학생키우기·루미나 테일즈는 게임 모음(my-games) 카드로 옮겼다. 게임 파일은 이 사이트의 /daehaksaeng/, /lumina-tales/ 에 그대로 둔다.
-            var LINKS = [];
+            // list 를 주면 카드 안에 링크 목록(제목·한 줄 설명·GitHub 버튼)이 생기고 아래 버튼 줄은 없어집니다.
+            // sources 에 저장소 이름을 적으면 그 저장소들의 마지막 푸시 시각 중 가장 최근 것을 '업데이트'로 보여 줍니다.
+            // 목록에 새 리포트를 넣으려면 해당 저장소 이름을 HIDE 에 적고, 여기 list·sources 에 한 줄씩 추가합니다.
+            var LINKS = [
+                {
+                    name: 'game-analysis', emoji: '📊', title: '게임분석',
+                    desc: '공개 기사·스토어 정보·순위 자료를 근거로 게임의 흥행 구조를 분석한 리포트 모음입니다.',
+                    note: '리포트 2편',
+                    sources: ['trickcal-report', 'nikke-report'],
+                    list: [
+                        { label: '트릭컬 리바이브 분석 리포트', sub: '스토리·캐릭터 공급 루프가 유저를 붙잡는 방식', url: 'https://trickcal-report.vercel.app/', gh: 'https://github.com/Junghan0329/trickcal-report' },
+                        { label: '니케 분석 리포트', sub: '35위에서 5위로, 4주년 매출 순위 반등 원인', url: 'https://nikke-report-puce.vercel.app/', gh: 'https://github.com/Junghan0329/nikke-report' }
+                    ]
+                }
+            ];
             var CUSTOM = {
                 'junghanlee': {
                     emoji: '🧑‍💻', title: '이정한 포트폴리오',
                     desc: 'Unity 개발자 이정한의 학력과 프로젝트 경험을 정리한 포트폴리오입니다.',
                     url: 'https://jung-han-lee.vercel.app/',
                     extras: [{ label: '이벤트 기획서', url: 'https://jung-han-lee.vercel.app/%EC%9D%B4%EB%B2%A4%ED%8A%B8%20%EA%B8%B0%ED%9A%8D.html' }]
-                },
-                'trickcal-report': {
-                    emoji: '📖', title: '트릭컬 리바이브 분석 리포트',
-                    desc: '스토리·캐릭터 공급 루프가 유저를 붙잡는 방식을 분석한 게임 재미요소 리포트입니다.',
-                    url: 'https://trickcal-report.vercel.app/'
                 },
                 'my-games': {
                     emoji: '🎮', title: '게임 모음',
@@ -188,6 +206,15 @@
             var repos = [];
             var etag = null;
             var lastOk = null;
+            var pushedBy = {}; // 저장소 이름(소문자) → 마지막 푸시 시각. 묶음 카드의 '업데이트' 표시에 씁니다.
+            function latestPush(names) {
+                var best = null;
+                (names || []).forEach(function (n) {
+                    var t = pushedBy[String(n).toLowerCase()];
+                    if (t && (!best || new Date(t) > new Date(best))) best = t;
+                });
+                return best;
+            }
 
             function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
             function safeUrl(u) { return /^(https?:\/\/|\/(?!\/))/i.test(u || '') ? u : ''; }
@@ -220,7 +247,7 @@
                         name: l.name, key: l.name.toLowerCase(), title: l.title, desc: l.desc,
                         emoji: l.emoji || EMOJI[l.name.length % EMOJI.length],
                         site: safeUrl(l.url || (l.buttons && l.buttons[0] && l.buttons[0].url) || ''), extras: l.extras || [],
-                        gh: '', lang: null, pushed: l.pushed || null, priv: !!l.private,
+                        gh: '', lang: null, pushed: latestPush(l.sources) || l.pushed || null, priv: !!l.private, list: l.list || null,
                         buttons: (l.buttons || []).filter(function (b) { return /^(https?:\/\/|\/(?!\/))/i.test(b.url || ''); }),
                         note: l.note || ''
                     };
@@ -237,9 +264,9 @@
             function render() {
                 var term = q.value.trim().toLowerCase();
                 var items = repos.slice().sort(function (a, b) { return new Date(b.pushed || 0) - new Date(a.pushed || 0); });
-                var shown = items.filter(function (r) { return !term || (r.title + ' ' + r.name + ' ' + r.desc).toLowerCase().indexOf(term) !== -1; });
+                var shown = items.filter(function (r) { return !term || (r.title + ' ' + r.name + ' ' + r.desc + ' ' + (r.list || []).map(function (x) { return x.label + ' ' + (x.sub || ''); }).join(' ')).toLowerCase().indexOf(term) !== -1; });
 
-                var deployed = items.filter(function (r) { return r.site; }).length;
+                var deployed = items.filter(function (r) { return r.site || (r.list && r.list.length); }).length;
                 stats.innerHTML = '<span class="chip">작업물<b>' + items.length + '</b></span><span class="chip">배포 중<b>' + deployed + '</b></span>';
 
                 if (!shown.length) { grid.innerHTML = '<div class="empty">' + (term ? '검색 결과가 없어요.' : '표시할 작업물이 없어요.') + '</div>'; return; }
@@ -251,12 +278,16 @@
                         : '<span class="nosite" title="' + (r.priv ? '웹 빌드를 올리면 이 자리에 플레이 버튼이 생겨요' : 'GitHub 저장소 About의 Website에 배포 주소를 넣으면 이 버튼이 자동으로 생겨요') + '">' + (r.priv ? '웹 빌드 준비 중' : '배포 주소 없음') + '</span>';
                     if (r.buttons && r.buttons.length) site = r.buttons.map(function (b, k) { return '<a class="' + (k ? 'gh' : 'go') + '"' + (isLocal(b.url) ? ' data-local="' + esc(b.url) + '" data-label="' + esc(b.label) + '"' : '') + ' href="' + esc(b.url) + '" target="_blank" rel="noopener">' + esc(b.label) + '</a>'; }).join('');
                     var extras = r.extras.length ? '<div class="extras">' + r.extras.map(function (e) { return '<a href="' + esc(e.url) + '" target="_blank" rel="noopener">→ ' + esc(e.label) + '</a>'; }).join('') + '</div>' : '';
-                    return '<article class="card c' + (i % 5) + '" style="animation-delay:' + Math.min(i, 8) * 60 + 'ms">' +
+                    var list = r.list && r.list.length ? '<div class="list">' + r.list.map(function (x) {
+                        return '<div class="row"><a class="main" href="' + esc(safeUrl(x.url)) + '" target="_blank" rel="noopener"><b>' + esc(x.label) + ' ↗</b>' + (x.sub ? '<small>' + esc(x.sub) + '</small>' : '') + '</a>' +
+                            (safeUrl(x.gh) ? '<a class="git" href="' + esc(safeUrl(x.gh)) + '" target="_blank" rel="noopener">GitHub</a>' : '') + '</div>';
+                    }).join('') + '</div>' : '';
+                    return '<article class="card c' + (i % 5) + (list ? ' listcard' : '') + '" style="animation-delay:' + Math.min(i, 8) * 60 + 'ms">' +
                         (isNew ? '<span class="new">NEW</span>' : '') +
                         '<div class="top"><div class="emoji">' + r.emoji + '</div><div><h2>' + esc(r.title) + '</h2><small>' + esc(r.name) + '</small></div></div>' +
                         '<div class="body"><p>' + esc(r.desc) + '</p>' +
-                        '<div class="meta">' + (r.priv ? '<span>🔒 비공개 · 본인만 열람</span>' : '') + (r.note ? '<span>' + esc(r.note) + '</span>' : '') + (r.lang ? '<span>' + esc(r.lang) + '</span>' : '') + (r.pushed ? '<span>업데이트 ' + ago(r.pushed) + '</span>' : '') + '</div>' + extras + '</div>' +
-                        '<div class="actions">' + site + (r.gh ? '<a class="gh" href="' + esc(r.gh) + '" target="_blank" rel="noopener">GitHub</a>' : '') + '</div></article>';
+                        '<div class="meta">' + (r.priv ? '<span>🔒 비공개 · 본인만 열람</span>' : '') + (r.note ? '<span>' + esc(r.note) + '</span>' : '') + (r.lang ? '<span>' + esc(r.lang) + '</span>' : '') + (r.pushed ? '<span>업데이트 ' + ago(r.pushed) + '</span>' : '') + '</div>' + extras + list + '</div>' +
+                        (list ? '' : '<div class="actions">' + site + (r.gh ? '<a class="gh" href="' + esc(r.gh) + '" target="_blank" rel="noopener">GitHub</a>' : '') + '</div>') + '</article>';
                 }).join('');
                 probeLocal();
             }
@@ -314,7 +345,7 @@
                         throw new Error('skip direct');
                     })
                     .then(function (data) {
-                        if (data) { repos = data.filter(function (r) { return (SHOW_FORKS || !r.fork) && !r.archived && HIDE.indexOf(r.name.toLowerCase()) === -1; }).map(normalize).concat(linkCards()); lastOk = new Date(); notice.className = 'notice'; render(); }
+                        if (data) { data.forEach(function (r) { pushedBy[r.name.toLowerCase()] = r.pushed_at; }); repos = data.filter(function (r) { return (SHOW_FORKS || !r.fork) && !r.archived && HIDE.indexOf(r.name.toLowerCase()) === -1; }).map(normalize).concat(linkCards()); lastOk = new Date(); notice.className = 'notice'; render(); }
                         setLive(true, '실시간 연결됨 · 마지막 확인 ' + lastOk.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
                     })
                     .catch(function () {
