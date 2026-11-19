@@ -155,7 +155,7 @@
             // 아래 목록은 제목·설명·추가 링크를 직접 꾸미고 싶은 저장소에만 적습니다. (키는 저장소 이름 소문자)
             var OWNER = 'Junghan0329';
             var SHOW_FORKS = false; // true로 바꾸면 다른 사람 저장소를 포크한 것도 함께 보여 줍니다.
-            var HIDE = ['my-works', 'daehaksaeng', '3dgame', 'memory-contradiction-web', 'trickcal-report', 'nikke-report']; // 목록에서 숨길 저장소(모음 페이지 자신, 게임 모음에 따로 올린 웹 빌드, 게임분석 카드 안에 묶은 리포트 저장소). 이름은 소문자로 적습니다.
+            var HIDE = ['my-works', 'daehaksaeng', '3dgame', 'memory-contradiction-web', 'trickcal-report', 'nikke-report', 'sword-hwasan-report']; // 목록에서 숨길 저장소(모음 페이지 자신, 게임 모음에 따로 올린 웹 빌드, 게임분석 카드 안에 묶은 리포트 저장소). 이름은 소문자로 적습니다.
             // 공개 저장소가 없는 작업물(비공개 저장소, 외부 페이지)도 카드로 보여 줍니다.
             // private: true 면 '비공개' 표시가 붙고, 버튼은 '열기 (본인만)'이 됩니다.
             // buttons 를 주면 그 버튼들을 순서대로 보여 줍니다 (첫 버튼이 강조). note 는 작은 표시 한 줄.
@@ -167,11 +167,13 @@
                 {
                     name: 'game-analysis', emoji: '📊', title: '게임분석',
                     desc: '공개 기사·스토어 정보·순위 자료를 근거로 게임의 흥행 구조를 분석한 리포트 모음입니다.',
-                    note: '리포트 2편',
+                    note: '리포트 3편',
                     sources: ['trickcal-report', 'nikke-report'],
+                    pushed: '2026-11-19T01:32:45Z', // 소드 X 스태프 리포트 저장소는 비공개라 API로 못 읽어서 푸시 시각을 직접 적는다. 새로 푸시하면 이 값도 고친다.
                     list: [
                         { label: '트릭컬 리바이브 분석 리포트', sub: '스토리·캐릭터 공급 루프가 유저를 붙잡는 방식', url: 'https://trickcal-report.vercel.app/', gh: 'https://github.com/Junghan0329/trickcal-report' },
-                        { label: '니케 분석 리포트', sub: '35위에서 5위로, 4주년 매출 순위 반등 원인', url: 'https://nikke-report-puce.vercel.app/', gh: 'https://github.com/Junghan0329/nikke-report' }
+                        { label: '니케 분석 리포트', sub: '35위에서 5위로, 4주년 매출 순위 반등 원인', url: 'https://nikke-report-puce.vercel.app/', gh: 'https://github.com/Junghan0329/nikke-report' },
+                        { label: '소드 X 스태프 × 화산귀환 콜라보 분석', sub: '화산파가 칸스틴으로 온 방식, 콜라보의 구성과 적합성', url: 'https://sword-hwasan-report.vercel.app/' }
                     ]
                 },
                 {
@@ -251,13 +253,15 @@
                 };
             }
 
+            function newer(a, b) { return a && b ? (new Date(a) > new Date(b) ? a : b) : (a || b || null); }
+
             function linkCards() {
                 return LINKS.map(function (l) {
                     return {
                         name: l.name, key: l.name.toLowerCase(), title: l.title, desc: l.desc,
                         emoji: l.emoji || EMOJI[l.name.length % EMOJI.length],
                         site: safeUrl(l.url || (l.buttons && l.buttons[0] && l.buttons[0].url) || ''), extras: l.extras || [],
-                        gh: '', lang: null, pushed: latestPush(l.sources) || l.pushed || null, priv: !!l.private, list: l.list || null,
+                        gh: '', lang: null, pushed: newer(latestPush(l.sources), l.pushed), priv: !!l.private, list: l.list || null,
                         buttons: (l.buttons || []).filter(function (b) { return /^(https?:\/\/|\/(?!\/))/i.test(b.url || ''); }),
                         note: l.note || ''
                     };
