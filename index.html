@@ -168,8 +168,7 @@
                     name: 'game-analysis', emoji: '📊', title: '게임분석',
                     desc: '공개 기사·스토어 정보·순위 자료를 근거로 게임의 흥행 구조를 분석한 리포트 모음입니다.',
                     note: '리포트 3편',
-                    sources: ['trickcal-report', 'nikke-report'],
-                    pushed: '2026-11-19T01:32:45Z', // 소드 X 스태프 리포트 저장소는 비공개라 API로 못 읽어서 푸시 시각을 직접 적는다. 새로 푸시하면 이 값도 고친다.
+                    sources: ['trickcal-report', 'nikke-report', 'sword-hwasan-report'],
                     list: [
                         { label: '트릭컬 리바이브 분석 리포트', sub: '스토리·캐릭터 공급 루프가 유저를 붙잡는 방식', url: 'https://trickcal-report.vercel.app/', gh: 'https://github.com/Junghan0329/trickcal-report' },
                         { label: '니케 분석 리포트', sub: '35위에서 5위로, 4주년 매출 순위 반등 원인', url: 'https://nikke-report-puce.vercel.app/', gh: 'https://github.com/Junghan0329/nikke-report' },
@@ -253,15 +252,13 @@
                 };
             }
 
-            function newer(a, b) { return a && b ? (new Date(a) > new Date(b) ? a : b) : (a || b || null); }
-
             function linkCards() {
                 return LINKS.map(function (l) {
                     return {
                         name: l.name, key: l.name.toLowerCase(), title: l.title, desc: l.desc,
                         emoji: l.emoji || EMOJI[l.name.length % EMOJI.length],
                         site: safeUrl(l.url || (l.buttons && l.buttons[0] && l.buttons[0].url) || ''), extras: l.extras || [],
-                        gh: '', lang: null, pushed: newer(latestPush(l.sources), l.pushed), priv: !!l.private, list: l.list || null,
+                        gh: '', lang: null, pushed: latestPush(l.sources) || l.pushed || null, priv: !!l.private, list: l.list || null,
                         buttons: (l.buttons || []).filter(function (b) { return /^(https?:\/\/|\/(?!\/))/i.test(b.url || ''); }),
                         note: l.note || ''
                     };
